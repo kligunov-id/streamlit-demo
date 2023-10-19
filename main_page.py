@@ -32,6 +32,6 @@ with column_computation:
 st.divider()
 
 if st.button("Get mean value"):
-    with st.spinner():
+    with st.spinner("Calculating..."):
         mean = engine_instance.calculate(array)
-    st.write("**Result:**", mean)
+    st.write("**Result:**", round(mean, 2))
