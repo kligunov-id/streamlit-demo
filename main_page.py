@@ -27,7 +27,9 @@ with column_data:
     st.session_state.saved_array = array
     st.write("List of random values:")
     st.write(array[np.newaxis, :])
-    st.button("Regenerate values")
+    if st.button("Regenerate values"):
+        del st.session_state['saved_array']
+        st.rerun()
 
 with column_computation:
     backbone_name = st.selectbox("Backbone: ",
