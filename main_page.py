@@ -20,8 +20,12 @@ with column_data:
         max_value=15,
         value=5
     )
-    st.write("List of random values:")
     array = np.random.randint(1, 10, size=array_size)
+    if 'saved_array' in st.session_state:
+        saved_size = st.session_state.saved_array.size
+        array[:saved_size] = st.session_state.saved_array[:array_size] 
+    st.session_state.saved_array = array
+    st.write("List of random values:")
     st.write(array[np.newaxis, :])
     st.button("Regenerate values")
 
