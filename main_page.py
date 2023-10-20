@@ -1,4 +1,6 @@
 import streamlit as st
+import matplotlib.pyplot as plt
+import seaborn as sns
 import numpy as np
 import timeit
 from backbones import backbone_dict
@@ -11,6 +13,7 @@ st.set_page_config(
     })
 
 st.title("Mean value calculator")
+st.header("Set up engine and data")
 
 column_data, column_computation = st.columns(2)
 
@@ -37,7 +40,7 @@ with column_computation:
     engine_instance = backbone_dict[backbone_name]()
     timing_on = st.checkbox("Measure perfomance")
 
-st.divider()
+st.header("Calculate result")
 
 if st.button("Get mean value"):
     time_start = timeit.default_timer() if timing_on else 0
@@ -49,3 +52,20 @@ if st.button("Get mean value"):
     if timing_on:
         result_message += f"_(```{total_time_ms}ms```elapsed)_"
     st.write(result_message)
+
+st.header("Explore data")
+
+with st.expander(
+    label="Data visualization",
+    expanded=bool(st.session_state.get('keep_maximized')),
+    ):
+    sns.set()
+    fig = plt.figure()
+    ax = sns.histplot(array, discrete=True)
+    ax.set(xlabel='Values')
+    ax.set_xticks(np.arange(1, 10))
+    st.pyplot(fig, dpi=200)
+
+    keep_maximized = st.checkbox(
+        label="Keep maximized _(experimental)_",
+        key="keep_maximized")
