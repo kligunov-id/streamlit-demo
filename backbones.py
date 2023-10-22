@@ -26,7 +26,7 @@ def parse_options(options_str, engine_cls):
         elif len(tokens) == 2:
             parameter_name = tokens[0]
             parameter_value = int(tokens[1])
-            if parameter_name in engine_cls.parameters:
+            if parameter_name in engine_cls.default_parameters:
                 parameters[parameter_name] = parameter_value
             else:
                 unrecognized_parameters[parameter_name] = parameter_value
@@ -37,10 +37,11 @@ def parse_options(options_str, engine_cls):
 
 class OptionsEngine:
     supported_flags = ["abs", "error", "squared"]
-    parameters = {}
+    default_parameters = {}
 
     def __init__(self, flags=None, parameters=None):
         self.flags = flags if flags else []
+        self.parameters = self.default_parameters.copy()
         if parameters is not None:
             self.parameters.update(parameters)
 
@@ -84,7 +85,7 @@ class NumpyEngine(OptionsEngine):
         return array.mean()
 
 class SlowEngine(NumpyEngine):
-    parameters = dict(sleep=2) | NumpyEngine.parameters
+    default_parameters = dict(sleep=2) | NumpyEngine.default_parameters
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
