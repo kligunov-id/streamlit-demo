@@ -40,6 +40,11 @@ if uploaded_file is not None:
     try:
         array = parse_file(uploaded_file)
         st.write("Parsed content", array[np.newaxis, :])
+        if uploaded_file.name in st.session_state.uploaded_arrays:
+            st.warning(
+            "File with the same name already exsisted and was overriden",
+            icon="⚠️")
+            st.session_state.warnings = True
         st.session_state.uploaded_arrays[uploaded_file.name] = array
         if st.session_state.warnings:
             update_status("Uploaded with warnings")
