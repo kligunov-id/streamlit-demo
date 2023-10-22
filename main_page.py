@@ -13,6 +13,13 @@ st.set_page_config(
         "About": "Demonstrational app made with Streamlit"
     })
 
+st.sidebar.title("Main page")
+st.sidebar.subheader("Set up engine and prepare data")
+status_tag = st.sidebar.markdown("___status___: Ready")
+
+def update_status(status_message):
+    status_tag.markdown(f"___status___: {status_message}")
+
 st.title("Mean value calculator")
 st.header("Set up engine and data")
 
@@ -57,10 +64,12 @@ with column_computation:
 st.header("Calculate result")
 
 if st.button("Get mean value"):
+    update_status("Processing...")
     time_start = timeit.default_timer() if timing_on else 0
     with st.spinner("Calculating..."):
         mean = engine_instance.calculate(array)
     time_end = timeit.default_timer() if timing_on else 0
+    update_status("Finished")
     total_time_ms = round((time_end - time_start) * 1000)
     result_message = f"**Result:**```{mean:.2f}```"
     if timing_on:
