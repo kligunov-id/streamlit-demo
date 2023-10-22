@@ -21,6 +21,12 @@ st.set_page_config(
 if st.session_state.get("array_size") is not None:
     st.session_state.array_size = st.session_state.array_size
 
+if st.session_state.get("saved_array_size") is None:
+    st.session_state.saved_array_size = 5
+
+def update_saved_array_size():
+    st.session_state.saved_array_size = st.session_state.array_size_slider
+
 st.sidebar.title("Main page")
 st.sidebar.subheader("Set up engine and prepare data")
 status_tag = st.sidebar.markdown("___status___: Ready")
@@ -44,7 +50,9 @@ with column_data:
         array_size = st.slider("Number of values", 
             min_value=1,
             max_value=15,
-            value=5,
+            value=st.session_state.saved_array_size,
+            key="array_size_slider",
+            on_change=update_saved_array_size,
         )
         array = np.random.randint(1, 10, size=array_size)
         if 'saved_array' in st.session_state:
