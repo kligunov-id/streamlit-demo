@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import timeit
+import math
 from backbones import backbone_dict
 
 st.set_page_config(
@@ -74,9 +75,14 @@ with st.expander(
     ):
     sns.set()
     fig = plt.figure()
-    ax = sns.histplot(array, discrete=True)
+    max_xtick = math.ceil(array.max()) + 1
+    min_xtick = math.floor(array.min())
+    small_discrete = max_xtick - min_xtick < 15
+    ax = sns.histplot(array, discrete=small_discrete)
     ax.set(xlabel='Values')
-    ax.set_xticks(np.arange(1, 10))
+    ax.set_xticks(np.arange(
+            math.floor(array.min()),
+            math.ceil(array.max()) + 1))
     st.pyplot(fig, dpi=200)
 
     keep_maximized = st.checkbox(
