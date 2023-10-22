@@ -18,21 +18,34 @@ st.header("Set up engine and data")
 column_data, column_computation = st.columns(2)
 
 with column_data:
-    array_size = st.slider("Number of values", 
-        min_value=1,
-        max_value=15,
-        value=5
-    )
-    array = np.random.randint(1, 10, size=array_size)
-    if 'saved_array' in st.session_state:
-        saved_size = st.session_state.saved_array.size
-        array[:saved_size] = st.session_state.saved_array[:array_size] 
-    st.session_state.saved_array = array
-    st.write("List of random values:")
+    array_size, array = None, None
+    chosen_array = "Randomized"
+    if st.session_state.get("uploaded_arrays"):
+        chosen_array = st.selectbox(
+            "Chose data to analyze",
+            ["Randomized"] + list(st.session_state.uploaded_arrays.keys()))
+    if chosen_array == "Randomized":
+        array_size = st.slider("Number of values", 
+            min_value=1,
+            max_value=15,
+            value=5,
+        )
+        array = np.random.randint(1, 10, size=array_size)
+        if 'saved_array' in st.session_state:
+            saved_size = st.session_state.saved_array.size
+            array[:saved_size] = st.session_state.saved_array[:array_size] 
+        st.session_state.saved_array = array
+    else:
+        array = st.session_state.uploaded_arrays[chosen_array]
+        array_size = array.size
+    st.write("List of random values:"
+        if chosen_array == "Randomized"
+        else "Uploaded file content")
     st.write(array[np.newaxis, :])
-    if st.button("Regenerate values"):
-        del st.session_state['saved_array']
-        st.rerun()
+    if chosen_array == "Randomized":
+        if st.button("Regenerate values"):
+            del st.session_state.saved_arrays['saved_array']
+            st.rerun()
 
 with column_computation:
     backbone_name = st.selectbox("Backbone: ",
