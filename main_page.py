@@ -45,7 +45,7 @@ with column_data:
     st.write(array[np.newaxis, :])
     if chosen_array == "Randomized":
         if st.button("Regenerate values"):
-            del st.session_state.saved_arrays['saved_array']
+            del st.session_state['saved_array']
             st.rerun()
 
 with column_computation:
