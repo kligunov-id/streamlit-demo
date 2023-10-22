@@ -86,11 +86,12 @@ with column_computation:
     parsed_options = try_parsing_options(
         options_line,
         engine_cls=backbone_dict[backbone_name])
-    flags, parameters = None, None
+    engine_instance = None
     if parsed_options is None:
         update_status("Error while parsing options")
     else:
         flags, parameters, unrecognized_flags, unrecognized_parameters = parsed_options
+        engine_instance = backbone_dict[backbone_name](flags, parameters)
         if unrecognized_flags or unrecognized_parameters:
             update_status("Some options not recognized")
         if unrecognized_flags:
@@ -101,12 +102,11 @@ with column_computation:
             st.warning(
                 f"Not recognized parameter{'s' if len(unrecognized_parameters) > 1 else ''} {', '.join(unrecognized_parameters.keys())}",
                 icon="⚠️")
-    engine_instance = backbone_dict[backbone_name](flags, parameters)
     timing_on = st.checkbox("Measure perfomance")
 
 st.header("Calculate result")
 
-if st.button("Get mean value"):
+if st.button("Get mean value", disabled=engine_instance is None):
     update_status("Processing...")
     time_start = timeit.default_timer() if timing_on else 0
     with st.spinner("Calculating..."):
