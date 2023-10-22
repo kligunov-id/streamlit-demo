@@ -17,6 +17,10 @@ st.set_page_config(
         "About": "Demonstrational app made with Streamlit"
     })
 
+# Interrupt widget clean-up process
+if st.session_state.get("array_size") is not None:
+    st.session_state.array_size = st.session_state.array_size
+
 st.sidebar.title("Main page")
 st.sidebar.subheader("Set up engine and prepare data")
 status_tag = st.sidebar.markdown("___status___: Ready")
@@ -138,5 +142,5 @@ with st.expander(
     st.pyplot(fig, dpi=200)
 
     keep_maximized = st.checkbox(
-        label="Keep maximized _(experimental)_",
+        label="Keep maximized",
         key="keep_maximized")
