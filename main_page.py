@@ -27,7 +27,7 @@ def update_status(status_message):
 st.title("Mean value calculator")
 st.header("Set up engine and data")
 
-column_data, column_computation = st.columns(2)
+column_data, column_computation = st.columns(2, gap="medium")
 
 with column_data:
     array_size, array = None, None

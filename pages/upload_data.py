@@ -21,7 +21,7 @@ if st.session_state.get("uploaded_arrays"):
     update_status(f"Uploaded {num_files_str}")
 
 st.title("Upload data")
-st.text("Here you can upload your own files to analyze them later")
+st.markdown("Here you can upload your own files to analyze them later")
 
 st.session_state.warnings = False
 
