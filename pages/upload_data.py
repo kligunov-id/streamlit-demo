@@ -6,6 +6,8 @@ st.set_page_config(
     page_icon="open_file_folder",
     )
 
+uploaded_files_limit = 5
+
 st.sidebar.title("Upload data")
 st.sidebar.subheader("Provide and manage files with custom data")
 status_tag = st.sidebar.markdown("___status___: Choose a file")
@@ -35,28 +37,31 @@ def parse_file(file):
 if "uploaded_arrays" not in st.session_state:
     st.session_state.uploaded_arrays = {}
 
-uploaded_file = st.file_uploader("Upload here")
-if uploaded_file is not None:
-    try:
-        array = parse_file(uploaded_file)
-        st.write("Parsed content", array[np.newaxis, :])
-        if uploaded_file.name in st.session_state.uploaded_arrays:
-            st.warning(
-            "File with the same name already exsisted and was overriden",
-            icon="⚠️")
-            st.session_state.warnings = True
-        st.session_state.uploaded_arrays[uploaded_file.name] = array
-        if st.session_state.warnings:
-            update_status("Uploaded with warnings")
-        else:
-            update_status("Successfully uploaded")
-    except ValueError:
-        st.error(
-            "File is not a space-separated list of floats",
-            icon="❗")
-        update_status("Error while uploading")
+if len(st.session_state.uploaded_arrays) < uploaded_files_limit:
+    uploaded_file = st.file_uploader("Upload here")
+    if uploaded_file is not None:
+        try:
+            array = parse_file(uploaded_file)
+            st.write("Parsed content", array[np.newaxis, :])
+            if uploaded_file.name in st.session_state.uploaded_arrays:
+                st.warning(
+                "File with the same name already exsisted and was overriden",
+                icon="⚠️")
+                st.session_state.warnings = True
+            st.session_state.uploaded_arrays[uploaded_file.name] = array
+            if st.session_state.warnings:
+                update_status("Uploaded with warnings")
+            else:
+                update_status("Successfully uploaded")
+        except ValueError:
+            st.error(
+                "File is not a space-separated list of floats",
+                icon="❗")
+            update_status("Error while uploading")
+else:
+    st.markdown(f"You have reached the upload limit of {uploaded_files_limit} files. To upload new data, first delete some")
 
-if st.session_state.get("uploaded_arrays"):
+if st.session_state.uploaded_arrays:
     st.markdown("Previously uploaded:")
     for array_name in st.session_state.uploaded_arrays:
         name_column, array_column, button_column = st.columns([.2, .65, .15])
