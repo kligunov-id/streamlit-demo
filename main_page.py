@@ -4,7 +4,11 @@ import seaborn as sns
 import numpy as np
 import timeit
 import math
-from backbones import backbone_dict
+from backbones import (
+    backbone_dict,
+    parse_options,
+    TwoMuchTokensError,
+    NotHyphenatedOptionError)
 
 st.set_page_config(
     page_title="Demo App",
@@ -55,10 +59,49 @@ with column_data:
             del st.session_state['saved_array']
             st.rerun()
 
+def try_parsing_options(options_line, engine_cls):
+    try:
+        parsed_options = parse_options(options_line, engine_cls)
+        return parsed_options
+    except ValueError:
+        st.error(
+            "Parameter value is not an integer",
+            icon="❗")
+    except TwoMuchTokensError:
+        st.error(
+            "Option is described by more than two tokens",
+            icon="❗")
+    except NotHyphenatedOptionError:
+        st.error("The first option is not hyphenated",
+            icon="❗")
+    return None
+
 with column_computation:
     backbone_name = st.selectbox("Backbone: ",
         backbone_dict.keys())
-    engine_instance = backbone_dict[backbone_name]()
+    options_line = st.text_input("Engine options:")
+    st.markdown("Examples of options line:")
+    st.markdown("```-squared -error``` for variance calculation")
+    st.markdown("```-sleep 1``` with slow engine to regulate speed")
+    parsed_options = try_parsing_options(
+        options_line,
+        engine_cls=backbone_dict[backbone_name])
+    flags, parameters = None, None
+    if parsed_options is None:
+        update_status("Error while parsing options")
+    else:
+        flags, parameters, unrecognized_flags, unrecognized_parameters = parsed_options
+        if unrecognized_flags or unrecognized_parameters:
+            update_status("Some options not recognized")
+        if unrecognized_flags:
+            st.warning(
+                f"Not recognized flag{'s' if len(unrecognized_flags) > 1 else ''} {', '.join(unrecognized_flags)}",
+                icon="⚠️")
+        if unrecognized_parameters:
+            st.warning(
+                f"Not recognized parameter{'s' if len(unrecognized_parameters) > 1 else ''} {', '.join(unrecognized_parameters.keys())}",
+                icon="⚠️")
+    engine_instance = backbone_dict[backbone_name](flags, parameters)
     timing_on = st.checkbox("Measure perfomance")
 
 st.header("Calculate result")
