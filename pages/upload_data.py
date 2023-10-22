@@ -13,7 +13,7 @@ status_tag = st.sidebar.markdown("___status___: Choose a file")
 def update_status(status_message):
     status_tag.markdown(f"___status___: {status_message}")
 
-if st.session_state.uploaded_arrays:
+if st.session_state.get("uploaded_arrays"):
     num_files = len(st.session_state.uploaded_arrays)
     num_files_str = f"{num_files} file{'s' if num_files > 1 else ''}"
     update_status(f"Uploaded {num_files_str}")
@@ -55,3 +55,17 @@ if uploaded_file is not None:
             "File is not a space-separated list of floats",
             icon="❗")
         update_status("Error while uploading")
+
+if st.session_state.get("uploaded_arrays"):
+    st.markdown("Previously uploaded:")
+    for array_name in st.session_state.uploaded_arrays:
+        name_column, array_column, button_column = st.columns([.2, .65, .15])
+        name_column.markdown(array_name)
+        array_column.write(
+            st.session_state.uploaded_arrays[array_name][np.newaxis,:])
+        def delete_array():
+            del st.session_state.uploaded_arrays[array_name]
+        button_column.button("Delete",
+            on_click=delete_array,
+            key=array_name)
+
