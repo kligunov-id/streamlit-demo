@@ -46,6 +46,8 @@ def parse_file(file):
 if "uploaded_arrays" not in st.session_state:
     st.session_state.uploaded_arrays = {}
 
+just_uploaded = ""
+
 if len(st.session_state.uploaded_arrays) < uploaded_files_limit:
     uploaded_file = st.file_uploader("Upload here")
     if uploaded_file is not None:
@@ -57,6 +59,7 @@ if len(st.session_state.uploaded_arrays) < uploaded_files_limit:
             if uploaded_file.name in st.session_state.uploaded_arrays:
                 warning("File with the same name already exsisted and was overriden")
             st.session_state.uploaded_arrays[uploaded_file.name] = array
+            just_uploaded = uploaded_file.name
         except ValueError:
             error("File is not a space-separated list of floats")
         except EmptyFileError:
@@ -71,9 +74,16 @@ if len(st.session_state.uploaded_arrays) < uploaded_files_limit:
 else:
     st.markdown(f"You have reached the upload limit of {uploaded_files_limit} files. To upload new data, first delete some")
 
-if st.session_state.uploaded_arrays:
+previously_uploaded = [
+    array_name
+    for array_name in st.session_state.uploaded_arrays
+    if array_name != just_uploaded]
+
+if previously_uploaded:
     st.markdown("Previously uploaded:")
-    for array_name in st.session_state.uploaded_arrays:
+    for array_name in previously_uploaded:
+        if array_name == just_uploaded:
+            continue
         name_column, array_column, button_column = st.columns([.2, .65, .15])
         name_column.markdown(array_name)
         array_column.write(
